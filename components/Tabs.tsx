@@ -26,8 +26,8 @@ export default function Tabs(props) {
           tabBarInactiveTintColor: 'gray',
         })}
       >
-        <Tab.Screen name="Home" component={Home} />
-        <Tab.Screen name="Profile" component={Profile} />
+        <Tab.Screen name="Home" component={Home}/>
+        <Tab.Screen name="Profile" component={Profile} options={{headerShown: false}} />
       </Tab.Navigator>
     </NavigationContainer>
   );

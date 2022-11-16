@@ -19,6 +19,7 @@ export default function Profile(){
       setSession(session)
     })
   }, [])
+  
   return(
     session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />
   )
