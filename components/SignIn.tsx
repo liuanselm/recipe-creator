@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { StatusBar } from 'react-native'
 import { Alert, StyleSheet, View, TouchableOpacity, Text } from 'react-native'
 import { supabase } from '../lib/supabase'
 import { Button, Input } from 'react-native-elements'
@@ -22,7 +23,7 @@ export default function SignIn({navigation}) {
   }
   
   return (
-    <View>
+    <View style={styles.view}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input
           label="Email"
@@ -52,6 +53,9 @@ export default function SignIn({navigation}) {
 }
 
 const styles = StyleSheet.create({
+  view : {
+    paddingTop: StatusBar.currentHeight,
+  },
   container: {
     marginTop: 40,
     padding: 12,

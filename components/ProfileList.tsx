@@ -1,11 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native'
 import { useState, useEffect } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 
 export default function ProfileList({navigation}){
   return(
-    <View>
+    <View style={styles.view}>
       <TouchableOpacity onPress={() => navigation.navigate('Recipes')} style={styles.recipesButton}><Text style={styles.recipesButtonText}>My Recipes</Text></TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Recipes')} style={styles.recipesButton}><Text style={styles.recipesButtonText}>My Friends</Text></TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Recipes')} style={styles.recipesButton}><Text style={styles.recipesButtonText}>Settings</Text></TouchableOpacity>
@@ -15,6 +15,9 @@ export default function ProfileList({navigation}){
 }
 
 const styles = StyleSheet.create({
+  view : {
+    paddingTop: StatusBar.currentHeight,
+  },
   recipesButtonText : {
     textAlign : 'center',
   },
