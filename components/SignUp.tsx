@@ -7,13 +7,18 @@ export default function Auth() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordRetyped, setPasswordRetyped] = useState('')
+  const [warning, setWarning] = useState('')
   const [user, setUser] = useState('')
   const [loading, setLoading] = useState(false)
 
   async function signUpWithEmail() {
     setLoading(true)
     if (password != passwordRetyped){
-      Alert.alert('Passwords do not match')
+      setWarning('Passwords do not match')
+    }
+    //username being chosen is verified on client side, add rules to supabase for proper authentication
+    else if (user == ''){
+      setWarning('You must choose a username')
     }
     else{
       const { data, error } = await supabase.auth.signUp({
@@ -27,7 +32,7 @@ export default function Auth() {
       })
       
       if (error){
-        Alert.alert(error.message)
+        setWarning(error.message)
       }
       else{
         Alert.alert('Check your email to verify, then sign in to use your account.')
@@ -76,14 +81,18 @@ export default function Auth() {
           autoCapitalize={'none'}
         />
       </View>
+      <View style={styles.warning}>{warning}</View>
       <View style={styles.verticallySpaced}>
-      <TouchableOpacity onPress={() => signUpWithEmail()} style={styles.signUpButton}><Text style={styles.signUpButtonText}>Sign up</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => signUpWithEmail()} style={styles.signUpButton}><Text style={styles.signUpButtonText}>Sign up</Text></TouchableOpacity>
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  warning : {
+    textAlign: 'center',
+  },
   container: {
     marginTop: 40,
     padding: 12,
