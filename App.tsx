@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import Account from './components/Account'
-import { View } from 'react-native'
+import { View, LogBox } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 
 import Tabs from './components/Tabs'

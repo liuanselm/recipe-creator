@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   Animated,
   View,
@@ -9,6 +10,7 @@ import {
 import { TabView, SceneMap } from 'react-native-tab-view';
 import Ingredients from './Ingredients'
 import Directions from './Directions'
+import Information from './Information';
 
 const SecondRoute = () => (
   <View style={[styles.container,]} />
@@ -20,6 +22,7 @@ export default class TabViewExample extends React.Component {
     routes: [
       { key: 'first', title: 'Ingredients' },
       { key: 'second', title: 'Directions' },
+      { key: 'third', title: 'Info'}
     ],
   };
 
@@ -37,7 +40,6 @@ export default class TabViewExample extends React.Component {
               inputIndex === i ? 1 : 0.5
             ),
           });
-
           return (
             <TouchableOpacity
               style={styles.tabItem}
@@ -53,6 +55,7 @@ export default class TabViewExample extends React.Component {
   _renderScene = SceneMap({
     first: Ingredients,
     second: Directions,
+    third: Information,
   });
 
   render() {
