@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import Ingredients from './Ingredients'
+import Directions from './Directions'
 
 const SecondRoute = () => (
   <View style={[styles.container,]} />
@@ -51,7 +52,7 @@ export default class TabViewExample extends React.Component {
 
   _renderScene = SceneMap({
     first: Ingredients,
-    second: SecondRoute,
+    second: Directions,
   });
 
   render() {
