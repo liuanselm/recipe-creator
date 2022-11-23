@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
 import DraggableFlatList, {ScaleDecorator,RenderItemParams} from "react-native-draggable-flatlist";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -7,41 +7,52 @@ import { event } from "react-native-reanimated";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const storeData = async (value) => {
-  try {
-    const jsonValue = JSON.stringify(value)
-    await AsyncStorage.setItem('@storage_Key', jsonValue)
-  } catch (e) {
-    // saving error
-  }
-}
-
-const getData = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem('@storage_Key')
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  }catch(e){
-  // error reading value
-  }
-}
-
-let a = [];
-
-const printData = (value) => {
-  a = value;
-}
-
 export default function Ingredients() {
   const [quantityState, setQuantityState] = useState('');
   const [unitState, setUnitState] = useState('');
   const [ingredientState, setIngredientState] = useState('');
-  const [TEMP_DATA, setTEMP_DATA] = useState(a);
+  const [TEMP_DATA, setTEMP_DATA] = useState([]);
   const [height, setHeight] = useState(0);
 
-  const addElement = (id, name, quantity, unit) => {
-    setTEMP_DATA(TEMP_DATA.concat(({id: id, name: name, quantity: quantity, unit: unit})))
+  //this is to load the saved async storage on load, runs once
+  useEffect(()=>{
+    getData().then(value=>setTEMP_DATA(value))
+  },[])
+
+  //every time temp_data state updates, update async storage
+  useEffect(()=>{
     storeData(TEMP_DATA)
-    getData().then(value=>printData(value))
+  },[TEMP_DATA])
+
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('@storage_Key', jsonValue)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  
+  const clearData = async () => {
+    try{
+      await AsyncStorage.setItem('@storage_Key', JSON.stringify([]))
+      setTEMP_DATA([])
+      } catch(e){
+        console.log(e)
+    }
+  }
+  
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@storage_Key')
+      return jsonValue != null ? JSON.parse(jsonValue) : [];
+    }catch(e){
+    // error reading value
+    }
+  }
+  
+  const addElement = async (id, name, quantity, unit) => {
+    await setTEMP_DATA(TEMP_DATA.concat(({id: id, name: name, quantity: quantity, unit: unit})))
   }
 
   const deleteSelectedElement = (id, name) => {
@@ -57,7 +68,7 @@ export default function Ingredients() {
         },
       ])
   }
-
+  
   const ItemRender = ({ id, name, quantity, unit, drag, isActive }: RenderItemParams<Item>) => {
     return (
       <TouchableOpacity style={[styles.itemView, {borderColor: isActive ? "tomato" : "black"}]} onLongPress={drag} disabled={isActive}>
@@ -83,6 +94,7 @@ export default function Ingredients() {
           <TextInput onChangeText={(text)=> setQuantityState(text)} placeholder='Quantity' multiline={true} maxLength={5} style={{flex:1}}></TextInput>
           <TextInput onChangeText={(text) => setUnitState(text)} placeholder='Unit' multiline={true} maxLength={5} style={{flex:1}}></TextInput>
           <TextInput onChangeText={(text)=> setIngredientState(text)} placeholder='New ingredient' style={{flex:3}}></TextInput>
+          <TouchableOpacity style={{padding:10}} onPress={()=>clearData()}><Ionicons name="trash"></Ionicons></TouchableOpacity>
           <TouchableOpacity style={{padding:10}} onPress={()=>addElement((TEMP_DATA.length+1) * Math.random()*100, ingredientState, quantityState, unitState)}><Text><Ionicons name="add-circle"></Ionicons></Text></TouchableOpacity>
         </View>
     </View>
@@ -90,12 +102,6 @@ export default function Ingredients() {
 }
 
 const styles = StyleSheet.create({
-  text: {
-    color: "white",
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
   itemView : {
     backgroundColor: 'white',
     flex: 1,
