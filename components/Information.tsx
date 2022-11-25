@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Image, View, Platform, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { Button, Image, View, Platform, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../lib/supabase'
+import { Session } from '@supabase/supabase-js'
 
 export default function Information() {
   const [image, setImage] = useState('https://cdn-icons-png.flaticon.com/512/1160/1160358.png');
@@ -11,13 +13,67 @@ export default function Information() {
   const [summary, setSummary] = useState('')
   const [servingSize, setServingSize] = useState('')
   const [data, setData] = useState({})
+  const [uploadIngredients, setUploadIngredients] = useState('')
+  const [uploadDirections, setUploadDirections] = useState('')
+  const [username, setUsername] = useState('')
 
   var ws = new WebSocket('ws://192.168.1.24:3000/');
 
+  const [session, setSession] = useState<Session | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  //get username
+  /*
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (session) getProfile()
+  }, [session])
+
+  async function getProfile() {
+    try {
+      setLoading(true)
+      if (!session?.user) throw new Error('No user on the session!')
+
+      let { data, error, status } = await supabase
+        .from('profiles')
+        .select(`username, website, avatar_url`)
+        .eq('id', session?.user.id)
+        .single()
+      if (error && status !== 406) {
+        throw error
+      }
+
+      if (data) {
+        setUsername(data.username)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+*/
   //this is to load the saved async storage on load, runs once
   useEffect(()=>{
     getDataImage().then(value=>setImage(value))
   },[])
+
+  //loads ingredient and directions from async using effect as useState does not reflect changes immedietely
+  useEffect(()=>{
+    getData('ingredientKey').then(value=>setUploadIngredients(JSON.stringify(value)))
+    getData('directionsKey').then(value=>setUploadDirections(JSON.stringify(value)))
+  })
 
   //every time temp_data state updates, update async storage
   useEffect(()=>{
@@ -48,7 +104,7 @@ export default function Information() {
     getData('dataKey').then(value=>setServingSize(value.servingSize))
   },[])
 
-
+  //any time the states title summary prep or serving size change, update the data state
   useEffect(()=>{
     setData({title: title, prep: prep, summary: summary, servingSize: servingSize})
   },[title, summary, prep, servingSize])
@@ -75,15 +131,6 @@ export default function Information() {
     }
   }
 
-  const getDataString = async (key) => {
-    try {
-      const value = await AsyncStorage.getItem(key)
-      return value
-    }catch(e){
-
-    }
-  }
-
   const deletePicture = () => {
     setImage('https://cdn-icons-png.flaticon.com/512/1160/1160358.png')
   }
@@ -105,21 +152,11 @@ export default function Information() {
     }
   };
 
-  const uploadHelper = (value, key) => {
-    const uploadObject= {image: "", ingredients: "", directions: "", info: ""}
-    switch(key){
-      case 'image':
-        uploadObject.image = value
-      case 'ingredients':
-        uploadObject.ingredients = value
-    }
-    ws.send(JSON.stringify(uploadObject))
-  }
-
   const upload = async ()=>{
     console.log('sending fetch')
-    getDataImage().then(value=>uploadHelper(value, 'image'))
-    getData('ingredientKey').then(value=>uploadHelper(JSON.stringify(value), 'ingredients'))
+    const uploadObject = {image: image, ingredients: uploadIngredients, directions: uploadDirections, info: data}
+    console.log(uploadObject)
+    ws.send(JSON.stringify(uploadObject))
   }
 
   return (
@@ -151,6 +188,7 @@ export default function Information() {
 
 const styles = StyleSheet.create({
   view : {
+    backgroundColor: 'white',
     borderWidth: 1,
     borderColor: 'tomato',
     margin: 10,
@@ -159,6 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   viewFull: {
+    backgroundColor: 'white',
     borderWidth: 1,
     borderColor: 'tomato',
     margin: 10,
