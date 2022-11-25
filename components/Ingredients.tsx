@@ -27,24 +27,15 @@ export default function Ingredients() {
   const storeData = async (value) => {
     try {
       const jsonValue = JSON.stringify(value)
-      await AsyncStorage.setItem('@storage_Key', jsonValue)
+      await AsyncStorage.setItem('ingredientKey', jsonValue)
     } catch (e) {
       console.log(e)
     }
   }
   
-  const clearData = async () => {
-    try{
-      await AsyncStorage.setItem('@storage_Key', JSON.stringify([]))
-      setTEMP_DATA([])
-      } catch(e){
-        console.log(e)
-    }
-  }
-  
   const getData = async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem('@storage_Key')
+      const jsonValue = await AsyncStorage.getItem('ingredientKey')
       return jsonValue != null ? JSON.parse(jsonValue) : [];
     }catch(e){
     // error reading value
@@ -94,7 +85,6 @@ export default function Ingredients() {
           <TextInput onChangeText={(text)=> setQuantityState(text)} placeholder='Quantity' multiline={true} maxLength={5} style={{flex:1}}></TextInput>
           <TextInput onChangeText={(text) => setUnitState(text)} placeholder='Unit' multiline={true} maxLength={5} style={{flex:1}}></TextInput>
           <TextInput onChangeText={(text)=> setIngredientState(text)} placeholder='New ingredient' style={{flex:3}}></TextInput>
-          <TouchableOpacity style={{padding:10}} onPress={()=>clearData()}><Ionicons name="trash"></Ionicons></TouchableOpacity>
           <TouchableOpacity style={{padding:10}} onPress={()=>addElement((TEMP_DATA.length+1) * Math.random()*100, ingredientState, quantityState, unitState)}><Text><Ionicons name="add-circle"></Ionicons></Text></TouchableOpacity>
         </View>
     </View>

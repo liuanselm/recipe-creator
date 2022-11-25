@@ -7,6 +7,7 @@ import { View, LogBox } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 
 import Tabs from './components/Tabs'
+import TabsUnsigned from './components/TabsUnsigned'
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -22,6 +23,6 @@ export default function App() {
   }, [])
 
   return (
-    <Tabs session={session}/>
+    session && session.user ? <Tabs session={session} /> : <TabsUnsigned />
   )
 }

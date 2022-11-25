@@ -1,15 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
 import DraggableFlatList, {ScaleDecorator,RenderItemParams} from "react-native-draggable-flatlist";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { event } from "react-native-reanimated";
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default function Directions() {
   const [directions, setDirections] = useState('');
   const [TEMP_DATA, setTEMP_DATA] = useState([]);
-
   const [height, setHeight] = useState(0);
+
+  useEffect(()=>{
+    getData().then(value=>setTEMP_DATA(value))
+  },[])
+
+  //every time temp_data state updates, update async storage
+  useEffect(()=>{
+    storeData(TEMP_DATA)
+  },[TEMP_DATA])
+
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('directionsKey', jsonValue)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('directionsKey')
+      return jsonValue != null ? JSON.parse(jsonValue) : [];
+    }catch(e){
+      console.log(e)
+    }
+  }
 
   const addElement = (id, name, quantity, unit) => {
     setTEMP_DATA(TEMP_DATA.concat(({id: id, directions: directions})))
