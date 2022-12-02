@@ -7,7 +7,8 @@ import Auth from './Auth'
 import Account from './Account'
 
 
-export default function Profile(){
+export default function Profile({ session }: { session: Session }){
+  /*
   const [session, setSession] = useState<Session | null>(null)
 
   useEffect(() => {
@@ -19,6 +20,7 @@ export default function Profile(){
       setSession(session)
     })
   }, [])
+  */
   
   return(
     session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />

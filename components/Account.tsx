@@ -6,7 +6,11 @@ import Recipes from './Recipes'
 
 const Stack = createNativeStackNavigator();
 
-export default function Auth({}){
+//stack navigator that is displayed when user is signed in and in the profile section.
+//the profile list is the menu for my recipes, my friends, settings, etc
+//the stack screens for each item on the profilelist menu must be linked below
+
+export default function Account({ session }: { session: Session }){
   return(
     <Stack.Navigator initialRouteName='SignIn'>
       <Stack.Screen name = "ProfileList" component={ProfileList} options={{title: 'Profile', headerShown: false}}/>

@@ -1,22 +1,12 @@
 import * as React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import {
-  Animated,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  StatusBar,
-} from 'react-native';
+import { Animated, View, TouchableOpacity,  StyleSheet, StatusBar, } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import Ingredients from './Ingredients'
 import Directions from './Directions'
 import Information from './Information';
 
-const SecondRoute = () => (
-  <View style={[styles.container,]} />
-);
-
-export default class TabViewExample extends React.Component {
+export default class Add extends React.Component {
   state = {
     index: 0,
     routes: [
@@ -52,11 +42,16 @@ export default class TabViewExample extends React.Component {
     );
   };
 
-  _renderScene = SceneMap({
-    first: Ingredients,
-    second: Directions,
-    third: Information,
-  });
+  _renderScene = ({ route }) =>{
+    switch (route.key){
+      case 'first':
+        return <Ingredients session={this.props.session}/>
+      case 'second':
+        return <Directions />
+      case 'third':
+        return <Information session={this.props.session}/>
+    }
+  };
 
   render() {
     return (

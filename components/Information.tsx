@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase'
 import { Session } from '@supabase/supabase-js'
 
-export default function Information() {
+export default function Information({ session }: { session: Session }) {
   const [image, setImage] = useState('https://cdn-icons-png.flaticon.com/512/1160/1160358.png');
   const [title, setTitle] = useState('')
   const [prep, setPrep] = useState('')
@@ -16,29 +16,80 @@ export default function Information() {
   const [uploadIngredients, setUploadIngredients] = useState('')
   const [uploadDirections, setUploadDirections] = useState('')
   const [username, setUsername] = useState('')
-
-  var ws = new WebSocket('ws://192.168.1.24:3000/');
-
-  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
-  //get username
-  /*
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
+  //loads ingredient and directions from async using effect as useState does not reflect changes immedietely
+  useEffect(()=>{
+    getData('ingredientKey').then(value=>setUploadIngredients(JSON.stringify(value)))
+    getData('directionsKey').then(value=>setUploadDirections(JSON.stringify(value)))
+  })
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  }, [])
+  //this is to load the saved async storage on load, runs once
+  //async for data fields
+  useEffect(()=>{
+    getDataImage().then(value=>setImage(value))
+    getData('dataKey').then(value=>setTitle(value.title))
+    getData('dataKey').then(value=>setSummary(value.summary))
+    getData('dataKey').then(value=>setPrep(value.prep))
+    getData('dataKey').then(value=>setServingSize(value.servingSize))
+  },[])
 
-  useEffect(() => {
-    if (session) getProfile()
-  }, [session])
+  useEffect(()=>{
+    if (session) getUserInfo()
+  },[session])
 
-  async function getProfile() {
+  //every time temp_data state updates, update async storage
+  useEffect(()=>{
+    storeDataImage(image)
+  },[image])
+
+  //any time the states title summary prep or serving size change, update the data state
+  useEffect(()=>{
+    setData({title: title, prep: prep, summary: summary, servingSize: servingSize})
+  },[title, summary, prep, servingSize])
+
+  useEffect(()=>{
+    storeData(data)
+  },[data])
+
+  const storeDataImage = async (value) => {
+    try{
+      await AsyncStorage.setItem('imageKey', value)
+    }catch (e){
+      console.log(e)
+    }
+  }
+
+  //stores info into async storage under one key
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('dataKey', jsonValue)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  
+  const getDataImage = async () => {
+    try{
+      const value = await AsyncStorage.getItem('imageKey')
+      return value;
+    }catch (e){
+      console.log(e)
+    }
+  }
+
+  //since objects are stored as strings in async, retrieve them and convert them back to objects
+  const getData = async (key) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(key)
+      return jsonValue != null ? JSON.parse(jsonValue) : [];
+    }catch(e){
+    // error reading value
+    }
+  }
+
+  const getUserInfo = async () => {
     try {
       setLoading(true)
       if (!session?.user) throw new Error('No user on the session!')
@@ -63,77 +114,6 @@ export default function Information() {
       setLoading(false)
     }
   }
-*/
-  //this is to load the saved async storage on load, runs once
-  useEffect(()=>{
-    getDataImage().then(value=>setImage(value))
-  },[])
-
-  //loads ingredient and directions from async using effect as useState does not reflect changes immedietely
-  useEffect(()=>{
-    getData('ingredientKey').then(value=>setUploadIngredients(JSON.stringify(value)))
-    getData('directionsKey').then(value=>setUploadDirections(JSON.stringify(value)))
-  })
-
-  //every time temp_data state updates, update async storage
-  useEffect(()=>{
-    storeDataImage(image)
-  },[image])
-
-  const storeDataImage = async (value) => {
-    try{
-      await AsyncStorage.setItem('imageKey', value)
-    }catch (e){
-      console.log(e)
-    }
-  }
-  
-  const getDataImage = async () => {
-    try{
-      const value = await AsyncStorage.getItem('imageKey')
-      return value;
-    }catch (e){
-      console.log(e)
-    }
-  }
-  //async for data fields
-  useEffect(()=>{
-    getData('dataKey').then(value=>setTitle(value.title))
-    getData('dataKey').then(value=>setSummary(value.summary))
-    getData('dataKey').then(value=>setPrep(value.prep))
-    getData('dataKey').then(value=>setServingSize(value.servingSize))
-  },[])
-
-  //any time the states title summary prep or serving size change, update the data state
-  useEffect(()=>{
-    setData({title: title, prep: prep, summary: summary, servingSize: servingSize})
-  },[title, summary, prep, servingSize])
-
-  useEffect(()=>{
-    storeData(data)
-  },[data])
-  
-  const storeData = async (value) => {
-    try {
-      const jsonValue = JSON.stringify(value)
-      await AsyncStorage.setItem('dataKey', jsonValue)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  const getData = async (key) => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(key)
-      return jsonValue != null ? JSON.parse(jsonValue) : [];
-    }catch(e){
-    // error reading value
-    }
-  }
-
-  const deletePicture = () => {
-    setImage('https://cdn-icons-png.flaticon.com/512/1160/1160358.png')
-  }
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -152,11 +132,12 @@ export default function Information() {
     }
   };
 
-  const upload = async ()=>{
-    console.log('sending fetch')
-    const uploadObject = {image: image, ingredients: uploadIngredients, directions: uploadDirections, info: data}
-    console.log(uploadObject)
-    ws.send(JSON.stringify(uploadObject))
+  const deletePicture = () => {
+    setImage('https://cdn-icons-png.flaticon.com/512/1160/1160358.png')
+  }
+
+  const upload = async () => {
+    let { error } = await supabase.from('recipes').insert({ingredients: uploadIngredients, directions: uploadDirections, image: image, info: JSON.stringify(data), user: username, user_id: session?.user.id}).select()
   }
 
   return (

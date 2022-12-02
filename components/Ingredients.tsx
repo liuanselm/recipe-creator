@@ -6,8 +6,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { event } from "react-native-reanimated";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Session } from '@supabase/supabase-js'
 
-export default function Ingredients() {
+export default function Ingredients({ session }: { session: Session }) {
   const [quantityState, setQuantityState] = useState('');
   const [unitState, setUnitState] = useState('');
   const [ingredientState, setIngredientState] = useState('');
@@ -44,6 +45,7 @@ export default function Ingredients() {
   
   const addElement = async (id, name, quantity, unit) => {
     await setTEMP_DATA(TEMP_DATA.concat(({id: id, name: name, quantity: quantity, unit: unit})))
+    console.log(session.user)
   }
 
   const deleteSelectedElement = (id, name) => {

@@ -77,9 +77,9 @@ export default function Directions() {
         />
       </GestureHandlerRootView>
       <View style={styles.bottomAdd} onLayout={(event)=> setHeight(event.nativeEvent.layout.height+20)}>
-          <TextInput onChangeText={(text)=> setDirections(text)} placeholder='Directions' style={{flex:3}}></TextInput>
-          <TouchableOpacity style={{padding:10}} onPress={()=>addElement((TEMP_DATA.length+1) * Math.random()*100, directions)}><Text><Ionicons name="add-circle"></Ionicons></Text></TouchableOpacity>
-        </View>
+        <TextInput onChangeText={(text)=> setDirections(text)} placeholder='Directions' style={{flex:3}}></TextInput>
+        <TouchableOpacity style={{padding:10}} onPress={()=>addElement((TEMP_DATA.length+1) * Math.random()*100, directions)}><Text><Ionicons name="add-circle"></Ionicons></Text></TouchableOpacity>
+      </View>
     </View>
   );
 }

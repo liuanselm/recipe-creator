@@ -2,13 +2,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { View, Text } from 'react-native'
+import { Session } from '@supabase/supabase-js'
 import Home from './Home'
 import Profile from './Profile'
 import Add from './Add'
 
 const Tab = createBottomTabNavigator();
 
-export default function Tabs(props) {
+export default function Tabs({ session }: { session: Session }){
   return (
     <NavigationContainer>
       <Tab.Navigator
@@ -31,8 +32,8 @@ export default function Tabs(props) {
         })}
       >
         <Tab.Screen name="Home" component={Home} options={{headerShown: false}}/>
-        <Tab.Screen name="Add Recipe" component={Add} options={{headerShown: false}}/>
-        <Tab.Screen name="Profile" component={Profile} options={{headerShown: false}} />
+        <Tab.Screen name="Add Recipe" children={()=><Add session={session}/>} options={{headerShown: false}}/>
+        <Tab.Screen name="Profile" children={()=><Profile session={session} />} options={{headerShown: false}} />
       </Tab.Navigator>
     </NavigationContainer>
   );
