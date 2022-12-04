@@ -45,7 +45,6 @@ export default function Ingredients({ session }: { session: Session }) {
   
   const addElement = async (id, name, quantity, unit) => {
     await setTEMP_DATA(TEMP_DATA.concat(({id: id, name: name, quantity: quantity, unit: unit})))
-    console.log(session.user)
   }
 
   const deleteSelectedElement = (id, name) => {
@@ -80,7 +79,7 @@ export default function Ingredients({ session }: { session: Session }) {
           data={TEMP_DATA}
           onDragEnd={({ data }) => setTEMP_DATA(data)}
           renderItem={({ item, drag, isActive }) => <ItemRender id={item.id} name={item.name} quantity={item.quantity} unit={item.unit} drag={drag} isActive={isActive}/>}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => item.id}
         />
       </GestureHandlerRootView>
       <View style={styles.bottomAdd} onLayout={(event)=> setHeight(event.nativeEvent.layout.height+20)}>

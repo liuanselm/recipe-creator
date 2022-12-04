@@ -32,6 +32,7 @@ export default class Add extends React.Component {
           });
           return (
             <TouchableOpacity
+              key={i}
               style={styles.tabItem}
               onPress={() => this.setState({ index: i })}>
               <Animated.Text style={{ opacity, color: 'tomato' }}>{route.title}</Animated.Text>

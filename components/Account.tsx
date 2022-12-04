@@ -14,7 +14,7 @@ export default function Account({ session }: { session: Session }){
   return(
     <Stack.Navigator initialRouteName='SignIn'>
       <Stack.Screen name = "ProfileList" component={ProfileList} options={{title: 'Profile', headerShown: false}}/>
-      <Stack.Screen name = "Recipes" component={Recipes} options={{title: 'Recipes'}}/>
+      <Stack.Screen name = "Recipes" children={()=><Recipes session={session}/>} options={{title: 'Recipes'}}/>
     </Stack.Navigator>
   )
 }

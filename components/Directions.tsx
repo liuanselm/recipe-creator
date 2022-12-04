@@ -73,7 +73,7 @@ export default function Directions() {
           data={TEMP_DATA}
           onDragEnd={({ data }) => setTEMP_DATA(data)}
           renderItem={({ item, drag, isActive }) => <ItemRender id={item.id} direction={item.directions} drag={drag} isActive={isActive}/>}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => item.id}
         />
       </GestureHandlerRootView>
       <View style={styles.bottomAdd} onLayout={(event)=> setHeight(event.nativeEvent.layout.height+20)}>

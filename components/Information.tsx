@@ -45,8 +45,8 @@ export default function Information({ session }: { session: Session }) {
 
   //any time the states title summary prep or serving size change, update the data state
   useEffect(()=>{
-    setData({title: title, prep: prep, summary: summary, servingSize: servingSize})
-  },[title, summary, prep, servingSize])
+    setData({title: title, prep: prep, summary: summary, servingSize: servingSize, image: image})
+  },[title, summary, prep, servingSize, image])
 
   useEffect(()=>{
     storeData(data)
@@ -137,7 +137,7 @@ export default function Information({ session }: { session: Session }) {
   }
 
   const upload = async () => {
-    let { error } = await supabase.from('recipes').insert({ingredients: uploadIngredients, directions: uploadDirections, image: image, info: JSON.stringify(data), user: username, user_id: session?.user.id}).select()
+    let { error } = await supabase.from('recipes').insert({ingredients: uploadIngredients, directions: uploadDirections, image: image, info: JSON.stringify(data), user: username, user_id: session?.user.id, title: title, summary: summary, prep: prep, servingSize: servingSize}).select()
   }
 
   return (
