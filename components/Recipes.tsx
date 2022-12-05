@@ -2,14 +2,17 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image } from 'react
 import { useState, useEffect } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
-
+import { useIsFocused} from "@react-navigation/native"; 
 
 export default function Recipes({ session }: { session: Session }){
   const [info, setInfo] = useState([])
+  const isFocused = useIsFocused();
 
-  useEffect(()=>{
-    getInfo()
-  },[])
+  useEffect(() => {
+    if (isFocused){
+      getInfo()
+    }
+  },[isFocused])
 
   const getInfo = async () => {
     try{

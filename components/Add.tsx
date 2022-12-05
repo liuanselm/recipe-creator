@@ -73,7 +73,6 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    paddingTop: StatusBar.currentHeight,
   },
   tabItem: {
     flex: 1,

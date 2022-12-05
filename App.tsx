@@ -8,6 +8,8 @@ import { View, LogBox, Alert } from 'react-native'
 
 import Tabs from './components/Tabs'
 import TabsUnsigned from './components/TabsUnsigned'
+import Drawer from './components/Drawer'
+import DrawerUnsigned from './components/DrawerUnsigned'
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -24,6 +26,6 @@ export default function App() {
   }, [])
 
   return (
-    session && session.user ? <Tabs session={session} /> : <TabsUnsigned />
+    session && session.user ? <Drawer session={session} /> : <DrawerUnsigned />
   )
 }

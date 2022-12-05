@@ -3,12 +3,9 @@ import { useState, useEffect } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 
-export default function ProfileList({navigation}){
+export default function Settings({navigation}){
   return(
     <View style={styles.view}>
-      <TouchableOpacity onPress={() => navigation.navigate('Recipes')} style={styles.recipesButton}><Text style={styles.recipesButtonText}>My Recipes</Text></TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Recipes')} style={styles.recipesButton}><Text style={styles.recipesButtonText}>My Friends</Text></TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Recipes')} style={styles.recipesButton}><Text style={styles.recipesButtonText}>Settings</Text></TouchableOpacity>
       <TouchableOpacity onPress={() => supabase.auth.signOut()} style={styles.signOutButton}><Text style={styles.signOutButtonText}>Sign out</Text></TouchableOpacity>
     </View>
   )
