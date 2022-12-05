@@ -5,40 +5,54 @@ import { supabase } from '../lib/supabase'
 
 
 export default function Recipes({ session }: { session: Session }){
-  const [titles, setTitles] = useState([])
-  const [titlesData, setTitlesData] = useState([])
+  const [info, setInfo] = useState([])
 
   useEffect(()=>{
-    getTitles()
+    getInfo()
   },[])
 
-  const getTitles = async () => {
+  const getInfo = async () => {
     try{
-      let queryTitles = await supabase.from('recipes').select('info').eq('user_id', session?.user.id).then(values=>setTitles(values.data))
+      let queryInfo = await supabase.from('recipes').select('id, title, image').eq('user_id', session?.user.id).then(values=>setInfo(values.data))
     }catch (error){
       console.log(error)
     }
   }
 
+  const Item = ({ title, image, id }) => (
+    <TouchableOpacity onPress={()=>console.log(id)} style={styles.item}>
+      <Image source={{uri: image}} style={{ width: 50, height: 50 }}></Image>
+      <Text style={styles.text}>{title}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderItem = ({ item }) => (
+    <Item title={item.title} image={item.image} id={item.id} />
+  )
+
   return(
     <View>
-      {titles.map((i, index)=>{
-        return(
-          <View key={index}>
-            <Text>{JSON.parse(i.info).title}</Text>
-            <Image source={{uri: JSON.parse(i.info).image}} style={{ width: 50, height: 50 }}></Image>
-          </View>
-        )
-      })}
+      <FlatList
+      data={info}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => index}
+      />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   item: {
-    backgroundColor: '#f9c2ff',
+    backgroundColor: 'white',
     padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
+    margin: 10,
+    borderRadius: 10,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center'
   },
+  text: {
+    padding: 10,
+  }
 });
+
