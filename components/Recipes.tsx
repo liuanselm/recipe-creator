@@ -2,17 +2,27 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image } from 'react
 import { useState, useEffect } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
-import { useIsFocused} from "@react-navigation/native"; 
+import { useIsFocused} from "@react-navigation/native";
+import { useNavigation } from '@react-navigation/native';
+import { TextInput } from 'react-native-gesture-handler';
+import { withTheme } from 'react-native-elements';
 
 export default function Recipes({ session }: { session: Session }){
   const [info, setInfo] = useState([])
+  const [infoFiltered, setInfoFiltered] = useState([])
+  const [filter, setFilter] = useState('')
   const isFocused = useIsFocused();
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (isFocused){
       getInfo()
     }
   },[isFocused])
+
+  useEffect(()=>{
+    filterTitles()
+  },[filter])
 
   const getInfo = async () => {
     try{
@@ -22,8 +32,14 @@ export default function Recipes({ session }: { session: Session }){
     }
   }
 
+  const filterTitles = () => {
+    setInfoFiltered(info.filter(i => {
+      return i.title.toLowerCase().includes(filter.toLowerCase())
+    }))
+  }
+
   const Item = ({ title, image, id }) => (
-    <TouchableOpacity onPress={()=>console.log(id)} style={styles.item}>
+    <TouchableOpacity onPress={() => navigation.navigate('DisplayRecipes', {recipeTitle: title, recipeID: id})} style={styles.item}>
       <Image source={{uri: image}} style={{ width: 50, height: 50 }}></Image>
       <Text style={styles.text}>{title}</Text>
     </TouchableOpacity>
@@ -35,8 +51,10 @@ export default function Recipes({ session }: { session: Session }){
 
   return(
     <View>
+      <TextInput onChangeText={(text)=>setFilter(text)} style={styles.textInput} placeholder="Search..."></TextInput>
       <FlatList
-      data={info}
+      contentContainerStyle={{ paddingBottom: 80 }}
+      data={filter == '' ? info : infoFiltered}
       renderItem={renderItem}
       keyExtractor={(item, index) => index}
       />
@@ -47,8 +65,8 @@ export default function Recipes({ session }: { session: Session }){
 const styles = StyleSheet.create({
   item: {
     backgroundColor: 'white',
-    padding: 20,
     margin: 10,
+    padding: 10,
     borderRadius: 10,
     flex: 1,
     flexDirection: 'row',
@@ -56,6 +74,15 @@ const styles = StyleSheet.create({
   },
   text: {
     padding: 10,
+  },
+  textInput: {
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    margin: 10
+  },
+  view : {
+    flex: 1
   }
 });
 
