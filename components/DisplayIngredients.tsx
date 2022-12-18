@@ -9,6 +9,7 @@ import { Session } from '@supabase/supabase-js'
 
 export default function DisplayIngredients({recipeID}) {
   const [data, setData] = useState([]);
+  const [editable, setEditable] = useState(false)
   const [height, setHeight] = useState(0);
 
   useEffect(()=>{
@@ -22,9 +23,9 @@ export default function DisplayIngredients({recipeID}) {
   const ItemRender = ({ id, name, quantity, unit, drag, isActive }: RenderItemParams<Item>) => {
     return (
       <TouchableOpacity style={[styles.itemView, {borderColor: isActive ? "tomato" : "black"}]} onLongPress={drag} disabled={isActive}>
-        <Text placeholder='Quantity' multiline={true} maxLength={5} style={{flex:1}}>{quantity}</Text>
-        <Text placeholder='Unit' multiline={true} maxLength={5} style={{flex:1}}>{unit}</Text>
-        <Text placeholder='New ingredient' style={{flex:3}}>{name}</Text>
+        <TextInput placeholder='Quantity' defaultValue={quantity} editable={editable} multiline={true} maxLength={5} style={{flex:1, color: 'black'}}></TextInput>
+        <TextInput placeholder='Unit' multiline={true} defaultValue={unit} editable={editable} maxLength={5} style={{flex:1, color: 'black'}}></TextInput>
+        <TextInput placeholder='New ingredient' defaultValue={name} editable={editable} style={{flex:3, color: 'black'}}></TextInput>
       </TouchableOpacity>
     );
   };
@@ -34,11 +35,14 @@ export default function DisplayIngredients({recipeID}) {
       <GestureHandlerRootView style={{width:'100%', height:'100%'}}>
         <DraggableFlatList
           data={data}
-          onDragEnd={({ data }) => setIngredients(data)}
+          onDragEnd={({ data }) => setData(data)}
           renderItem={({ item, drag, isActive }) => <ItemRender id={item.id} name={item.name} quantity={item.quantity} unit={item.unit} drag={drag} isActive={isActive}/>}
           keyExtractor={(item, index) => item.id}
         />
       </GestureHandlerRootView>
+      <View style={styles.bottomAdd} onLayout={(event)=> setHeight(event.nativeEvent.layout.height+20)}>
+        <TouchableOpacity onPress={()=>setEditable(!editable)} style={{padding:10}}><Text>{editable ? <Ionicons name="create"></Ionicons> : <Ionicons name="create-outline"></Ionicons>}</Text></TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -68,5 +72,6 @@ const styles = StyleSheet.create({
     marginRight: 5,
     position: 'absolute',
     bottom: 0,
+    right: 0,
   },
 });
